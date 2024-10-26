@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>BookVault</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 20px;
+      text-align: center;
+    }
+    h1 {
+      color: #4a4a4a;
+    }
+    .book-entry, .book-list, .goal-section {
+      margin: 20px 0;
+    }
+    label {
+      display: block;
+      margin: 5px 0;
+      font-weight: bold;
+    }
+    input, select, textarea, button {
+      padding: 8px;
+      margin: 5px 0;
+      width: 100%;
+      max-width: 300px;
+    }
+    .book-list {
+      text-align: left;
+    }
+    .book-item {
+      margin: 10px 0;
+      padding: 10px;
+      border: 1px solid #ccc;
+      border-radius: 5px;
+      background-color: #f9f9f9;
+    }
+  </style>
+</head>
+<body>
+
+  <h1>BookVault</h1>
+  <p>Track your reading goals, log books, and write reviews!</p>
+
+  <!-- Goal Section -->
+  <div class="goal-section">
+    <h2>Your Reading Goal</h2>
+    <label for="goal">Set a yearly reading goal:</label>
+    <input type="number" id="goal" placeholder="e.g., 20 books">
+    <button onclick="setGoal()">Set Goal</button>
+    <p id="goal-status"></p>
+  </div>
+
+  <!-- Add Book Section -->
+  <div class="book-entry">
+    <h2>Add a Book</h2>
+    <label for="title">Book Title</label>
+    <input type="text" id="title" placeholder="Enter book title">
+    <label for="author">Author</label>
+    <input type="text" id="author" placeholder="Enter author name">
+    <label for="status">Status</label>
+    <select id="status">
+      <option value="Want to Read">Want to Read</option>
+      <option value="Currently Reading">Currently Reading</option>
+      <option value="Finished">Finished</option>
+    </select>
+    <label for="review">Review</label>
+    <textarea id="review" rows="4" placeholder="Write your review here..."></textarea>
+    <button onclick="addBook()">Add Book</button>
+  </div>
+
+  <!-- Book List -->
+  <div class="book-list">
+    <h2>Your Book List</h2>
+    <div id="book-list"></div>
+  </div>
+
+  <script>
+    let books = [];
+    let readingGoal = 0;
+    let booksRead = 0;
+
+    // Set reading goal
+    function setGoal() {
+      readingGoal = document.getElementById('goal').value;
+      updateGoalStatus();
+    }
+
+    // Update goal status
+    function updateGoalStatus() {
+      const goalStatus = document.getElementById('goal-status');
+      goalStatus.textContent = `Goal: ${booksRead} of ${readingGoal} books read`;
+    }
+
+    // Add a new book
+    function addBook() {
+      const title = document.getElementById('title').value;
+      const author = document.getElementById('author').value;
+      const status = document.getElementById('status').value;
+      const review = document.getElementById('review').value;
+
+      if (title && author) {
+        const book = { title, author, status, review };
+        books.push(book);
+        if (status === "Finished") {
+          booksRead++;
+          updateGoalStatus();
+        }
+        displayBooks();
+        clearForm();
+      } else {
+        alert("Please enter both the title and author.");
+      }
+    }
+
+    // Clear form fields
+    function clearForm() {
+      document.getElementById('title').value = '';
+      document.getElementById('author').value = '';
+      document.getElementById('status').value = 'Want to Read';
+      document.getElementById('review').value = '';
+    }
+
+    // Display the book list
+    function displayBooks() {
+      const bookList = document.getElementById('book-list');
+      bookList.innerHTML = '';
+
+      books.forEach((book, index) => {
+        const bookItem = document.createElement('div');
+        bookItem.className = 'book-item';
+        bookItem.innerHTML = `
+          <strong>Title:</strong> ${book.title}<br>
+          <strong>Author:</strong> ${book.author}<br>
+          <strong>Status:</strong> ${book.status}<br>
+          <strong>Review:</strong> ${book.review || 'No review'}<br>
+          <button onclick="removeBook(${index})">Remove</button>
+        `;
+        bookList.appendChild(bookItem);
+      });
+    }
+
+    // Remove a book from the list
+    function removeBook(index) {
+      if (books[index].status === "Finished") {
+        booksRead--;
+        updateGoalStatus();
+      }
+      books.splice(index, 1);
+      displayBooks();
+    }
+  </script>
+</body>
+  </html>
